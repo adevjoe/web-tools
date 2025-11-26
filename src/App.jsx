@@ -5,12 +5,15 @@ import StringDedupe from './components/tools/StringDedupe';
 import DiffViewer from './components/tools/DiffViewer';
 import JsonFormatter from './components/tools/JsonFormatter';
 import Base64Converter from './components/tools/Base64Converter';
+import Home from './components/Home';
 
 function App() {
-  const [activeTool, setActiveTool] = useState('string-sort');
+  const [activeTool, setActiveTool] = useState('home');
 
   const renderTool = () => {
     switch (activeTool) {
+      case 'home':
+        return <Home setActiveTool={setActiveTool} />;
       case 'string-sort':
         return <StringSort />;
       case 'string-dedupe':
@@ -22,7 +25,7 @@ function App() {
       case 'base64':
         return <Base64Converter />;
       default:
-        return <StringSort />;
+        return <Home setActiveTool={setActiveTool} />;
     }
   };
 

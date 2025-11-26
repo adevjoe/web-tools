@@ -13,10 +13,10 @@ export default function Navbar({ activeTool, setActiveTool }) {
   return (
     <nav className="navbar">
       <div className="container navbar-content">
-        <div className="logo">
+        <button className="logo" onClick={() => setActiveTool('home')}>
           <Wrench size={24} className="text-blue-400" />
           <span>DevTools</span>
-        </div>
+        </button>
         <div className="nav-links">
           {tools.map((tool) => {
             const Icon = tool.icon;
