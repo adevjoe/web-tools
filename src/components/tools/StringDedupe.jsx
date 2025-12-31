@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Trash2 } from 'lucide-react';
+import { Hash, Trash2, Copy, CheckCircle } from 'lucide-react';
 
 export default function StringDedupe() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [ignoreCase, setIgnoreCase] = useState(false);
   const [trimWhitespace, setTrimWhitespace] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!input) {
@@ -22,11 +23,13 @@ export default function StringDedupe() {
       if (trimWhitespace) processLine = processLine.trim();
       if (ignoreCase) processLine = processLine.toLowerCase();
 
-      if (!seen.has(processLine)) {
+      if (processLine && !seen.has(processLine)) {
         seen.add(processLine);
-        // Keep original line formatting if possible, but if trimmed/lowercased matches, we skip.
-        // To keep original, we just check against the processed version.
         result.push(trimWhitespace ? line.trim() : line);
+      } else if (!processLine && !seen.has('__EMPTY_LINE__')) {
+          // Track empty lines too if we want, or just skip. Let's keep one empty line if they exist.
+          seen.add('__EMPTY_LINE__');
+          result.push('');
       }
     });
 
@@ -34,65 +37,72 @@ export default function StringDedupe() {
   }, [input, ignoreCase, trimWhitespace]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(output);
+    if (output) {
+      navigator.clipboard.writeText(output);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '1.5rem' }}>
-      <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 600 }}>String Deduplication</h2>
-      
-      <div className="tool-grid">
-        <div className="tool-col">
-          <div className="tool-header">
-            <label className="label">Input</label>
-          </div>
+    <div className="animate-fade-in">
+      <div className="tool-header-area">
+        <div>
+          <h2 className="text-gradient" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <Hash className="text-primary" />
+            Deduplicate Lines
+          </h2>
+          <p style={{ color: 'var(--text-muted)' }}>Remove duplicate lines from your text automatically.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="btn-premium btn-ghost" onClick={() => setInput('')}>
+            <Trash2 size={16} />
+            Clear
+          </button>
+          <button className="btn-premium btn-primary-gradient" onClick={copyToClipboard} disabled={!output}>
+            {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
+            {copied ? 'Copied!' : 'Copy Result'}
+          </button>
+        </div>
+      </div>
+
+      <div className="input-area two-col">
+        <div className="control-group">
+          <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Input Text</label>
           <textarea
-            className="textarea"
+            className="styled-textarea"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter text to deduplicate..."
+            placeholder="Paste text with duplicates here..."
           />
         </div>
 
-        <div className="tool-col">
-          <div className="tool-header">
-            <label className="label">Output</label>
-            <div className="tool-actions">
-              <button
-                className={`btn ${ignoreCase ? 'btn-primary' : 'btn-secondary'}`}
+        <div className="control-group">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)' }}>Deduplicated Output</label>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button 
+                className={`btn-premium ${ignoreCase ? 'btn-primary-gradient' : 'btn-ghost'}`}
                 onClick={() => setIgnoreCase(!ignoreCase)}
-                title="Ignore Case"
+                style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem', height: 'auto' }}
               >
-                Aa
+                Ignore Case
               </button>
-              <button
-                className={`btn ${trimWhitespace ? 'btn-primary' : 'btn-secondary'}`}
+              <button 
+                className={`btn-premium ${trimWhitespace ? 'btn-primary-gradient' : 'btn-ghost'}`}
                 onClick={() => setTrimWhitespace(!trimWhitespace)}
-                title="Trim Whitespace"
+                style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem', height: 'auto' }}
               >
-                _
-              </button>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setInput('')}
-                title="Clear"
-              >
-                <Trash2 size={16} />
-              </button>
-               <button
-                className="btn btn-secondary"
-                onClick={copyToClipboard}
-                title="Copy"
-              >
-                <Copy size={16} />
+                Trim Whitespace
               </button>
             </div>
           </div>
           <textarea
-            className="textarea"
+            className="styled-textarea"
             value={output}
             readOnly
-            placeholder="Deduplicated output will appear here..."
+            placeholder="Result will appear here..."
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.45)' }}
           />
         </div>
       </div>

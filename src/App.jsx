@@ -1,50 +1,31 @@
-import React, { useState } from 'react';
-import Navbar from './components/Navbar';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './components/Home';
 import StringSort from './components/tools/StringSort';
 import StringDedupe from './components/tools/StringDedupe';
 import DiffViewer from './components/tools/DiffViewer';
 import JsonFormatter from './components/tools/JsonFormatter';
 import Base64Converter from './components/tools/Base64Converter';
-import Home from './components/Home';
+import JwtDebugger from './components/tools/JwtDebugger';
+import UrlTools from './components/tools/UrlTools';
+import CronParser from './components/tools/CronParser';
 
 function App() {
-  const [activeTool, setActiveTool] = useState('home');
-
-  const renderTool = () => {
-    switch (activeTool) {
-      case 'home':
-        return <Home setActiveTool={setActiveTool} />;
-      case 'string-sort':
-        return <StringSort />;
-      case 'string-dedupe':
-        return <StringDedupe />;
-      case 'diff':
-        return <DiffViewer />;
-      case 'json':
-        return <JsonFormatter />;
-      case 'base64':
-        return <Base64Converter />;
-      default:
-        return <Home setActiveTool={setActiveTool} />;
-    }
-  };
-
   return (
-    <>
-      <Navbar activeTool={activeTool} setActiveTool={setActiveTool} />
-      <main className="container" style={{ padding: '2rem 1.5rem', flex: 1 }}>
-        {renderTool()}
-      </main>
-      <footer style={{ 
-        textAlign: 'center', 
-        padding: '1.5rem', 
-        color: 'var(--text-secondary)',
-        borderTop: '1px solid var(--glass-border)',
-        marginTop: 'auto'
-      }}>
-        <p>© 2025 DevTools. Built with React & Vite.</p>
-      </footer>
-    </>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/string-sort" element={<StringSort />} />
+        <Route path="/string-dedupe" element={<StringDedupe />} />
+        <Route path="/diff" element={<DiffViewer />} />
+        <Route path="/json" element={<JsonFormatter />} />
+        <Route path="/base64" element={<Base64Converter />} />
+        <Route path="/jwt" element={<JwtDebugger />} />
+        <Route path="/url" element={<UrlTools />} />
+        <Route path="/cron" element={<CronParser />} />
+      </Routes>
+    </Layout>
   );
 }
 

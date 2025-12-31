@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Trash2, ArrowRightLeft, Binary, CheckCircle } from 'lucide-react';
+import { Link2, Trash2, Copy, CheckCircle, ArrowRightLeft } from 'lucide-react';
 
-export default function Base64Converter() {
+export default function UrlTools() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [mode, setMode] = useState('encode'); // encode, decode
@@ -15,16 +15,12 @@ export default function Base64Converter() {
 
     try {
       if (mode === 'encode') {
-        const bytes = new TextEncoder().encode(input);
-        const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join("");
-        setOutput(btoa(binString));
+        setOutput(encodeURIComponent(input));
       } else {
-        const binString = atob(input);
-        const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
-        setOutput(new TextDecoder().decode(bytes));
+        setOutput(decodeURIComponent(input));
       }
     } catch (err) {
-      setOutput('Invalid input for ' + mode);
+      setOutput('Invalid input for URL ' + mode);
     }
   }, [input, mode]);
 
@@ -41,10 +37,10 @@ export default function Base64Converter() {
       <div className="tool-header-area">
         <div>
           <h2 className="text-gradient" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-            <Binary className="text-primary" />
-            Base64 Converter
+            <Link2 className="text-primary" />
+            URL Tools
           </h2>
-          <p style={{ color: 'var(--text-muted)' }}>Securely encode and decode Base64 strings (UTF-8 supported).</p>
+          <p style={{ color: 'var(--text-muted)' }}>Encode and decode URL-safe strings.</p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button 
@@ -72,29 +68,26 @@ export default function Base64Converter() {
       <div className="input-area two-col">
         <div className="control-group">
           <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-            {mode === 'encode' ? 'Normal Text' : 'Base64 String'}
+            {mode === 'encode' ? 'Plain String' : 'Encoded URL Component'}
           </label>
           <textarea
             className="styled-textarea"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={mode === 'encode' ? "Enter text to encode..." : "Enter Base64 to decode..."}
+            placeholder={mode === 'encode' ? "Enter text to encode..." : "Enter encoded URL to decode..."}
           />
         </div>
 
         <div className="control-group">
           <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-            {mode === 'encode' ? 'Base64 Result' : 'Decoded Text'}
+            Result
           </label>
           <textarea
             className="styled-textarea"
             value={output}
             readOnly
             placeholder="Result will appear here..."
-            style={{ 
-              backgroundColor: 'rgba(0, 0, 0, 0.45)',
-              color: output.startsWith('Invalid') ? '#f87171' : 'inherit'
-            }}
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.45)' }}
           />
         </div>
       </div>

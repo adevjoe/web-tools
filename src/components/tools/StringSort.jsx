@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowDownAZ, ArrowUpAZ } from 'lucide-react';
+import { ArrowDownAZ, ArrowUpAZ, Type, Trash2, Copy, CheckCircle } from 'lucide-react';
 
 export default function StringSort() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [sortOrder, setSortOrder] = useState('asc'); // asc, desc
   const [caseSensitive, setCaseSensitive] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!input) {
@@ -15,67 +16,90 @@ export default function StringSort() {
 
     const lines = input.split('\n');
     const sorted = [...lines].sort((a, b) => {
-      if (!caseSensitive) {
-        a = a.toLowerCase();
-        b = b.toLowerCase();
-      }
-      if (a < b) return sortOrder === 'asc' ? -1 : 1;
-      if (a > b) return sortOrder === 'asc' ? 1 : -1;
+      let valA = caseSensitive ? a : a.toLowerCase();
+      let valB = caseSensitive ? b : b.toLowerCase();
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
 
     setOutput(sorted.join('\n'));
   }, [input, sortOrder, caseSensitive]);
 
+  const copyToClipboard = () => {
+    if (output) {
+      navigator.clipboard.writeText(output);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   return (
-    <div className="glass-panel" style={{ padding: '1.5rem' }}>
-      <h2 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', fontWeight: 600 }}>String Sort</h2>
-      
-      <div className="tool-grid">
-        <div className="tool-col">
-          <div className="tool-header">
-            <label className="label">Input</label>
-          </div>
+    <div className="animate-fade-in">
+      <div className="tool-header-area">
+        <div>
+          <h2 className="text-gradient" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <Type className="text-primary" />
+            String Sort
+          </h2>
+          <p style={{ color: 'var(--text-muted)' }}>Sort lines of text alphabetically or numerically.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="btn-premium btn-ghost" onClick={() => setInput('')}>
+            <Trash2 size={16} />
+            Clear
+          </button>
+          <button className="btn-premium btn-primary-gradient" onClick={copyToClipboard} disabled={!output}>
+            {copied ? <CheckCircle size={16} /> : <Copy size={16} />}
+            {copied ? 'Copied!' : 'Copy Result'}
+          </button>
+        </div>
+      </div>
+
+      <div className="input-area two-col">
+        <div className="control-group">
+          <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Input (one per line)</label>
           <textarea
-            className="textarea"
+            className="styled-textarea"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter text to sort (one item per line)..."
+            placeholder="Enter lines to sort..."
           />
         </div>
 
-        <div className="tool-col">
-          <div className="tool-header">
-            <label className="label">Output</label>
-            <div className="tool-actions">
-              <button
-                className={`btn ${sortOrder === 'asc' ? 'btn-primary' : 'btn-secondary'}`}
+        <div className="control-group">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-muted)' }}>Sorted Output</label>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+               <button 
+                className={`btn-premium ${sortOrder === 'asc' ? 'btn-primary-gradient' : 'btn-ghost'}`}
                 onClick={() => setSortOrder('asc')}
-                title="Ascending"
+                style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem', height: 'auto' }}
               >
-                <ArrowDownAZ size={16} />
+                <ArrowDownAZ size={14} /> Asc
               </button>
-              <button
-                className={`btn ${sortOrder === 'desc' ? 'btn-primary' : 'btn-secondary'}`}
+              <button 
+                className={`btn-premium ${sortOrder === 'desc' ? 'btn-primary-gradient' : 'btn-ghost'}`}
                 onClick={() => setSortOrder('desc')}
-                title="Descending"
+                style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem', height: 'auto' }}
               >
-                <ArrowUpAZ size={16} />
+                <ArrowUpAZ size={14} /> Desc
               </button>
-              <button
-                className={`btn ${caseSensitive ? 'btn-primary' : 'btn-secondary'}`}
+              <button 
+                className={`btn-premium ${caseSensitive ? 'btn-primary-gradient' : 'btn-ghost'}`}
                 onClick={() => setCaseSensitive(!caseSensitive)}
-                title="Case Sensitive"
+                style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem', height: 'auto' }}
               >
                 Aa
               </button>
             </div>
           </div>
           <textarea
-            className="textarea"
+            className="styled-textarea"
             value={output}
             readOnly
-            placeholder="Sorted output will appear here..."
+            placeholder="Result will appear here..."
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.45)' }}
           />
         </div>
       </div>
